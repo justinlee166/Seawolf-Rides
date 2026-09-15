@@ -1,86 +1,231 @@
 # Seawolf Rides
 
-Seawolf Rides is a mobile-first carpool coordination application for the Stony Brook community, developed for CSE 416 — Software Engineering. The project focuses on helping commuters plan rides ahead of time, find people with compatible routes and schedules, and turn compatible individual commutes into shared commutes.
+Seawolf Rides is a **mobile-first carpool coordination application for the Stony Brook community**, developed for CSE 416 — Software Engineering.
+
+The app helps commuters plan rides ahead of time, find people with compatible routes and schedules, and turn similar individual commutes into shared commutes.
 
 **Current milestone:** Milestone 1 — Proposal and Requirements
 
+---
+
 ## Problem
 
-Many Stony Brook commuters travel from similar areas to campus at similar times, but they do not have a structured way to determine whether sharing a ride is practical. Friends, group chats, Discord, Reddit, and word of mouth can introduce commuters, but they do not establish whether two people are traveling close enough to the same route at compatible times.
+Many Stony Brook commuters travel from similar areas at similar times, but there is no structured way to determine whether sharing a ride is actually practical.
 
-Commercial rideshare services can be expensive and address a different need. Seawolf Rides is not intended to replace Uber or Lyft; it is intended to connect people who are already making similar trips and may want to share commuting costs.
+Students already try to solve this informally through:
+
+- friends and classmates,
+- group chats,
+- Discord,
+- Reddit,
+- word of mouth.
+
+These channels can help someone find another commuter, but they do not automatically answer the harder questions:
+
+- Are we traveling on the same days?
+- Are our departure or arrival times compatible?
+- Is the rider actually close to the driver's route?
+- How much additional detour would the pickup require?
+
+A student may need to contact several people before finding someone whose route and schedule actually work.
+
+Commercial rideshare services solve a different problem and may be expensive for repeated commuting.
+
+Seawolf Rides focuses on commuters who are **already making similar trips** and makes finding a compatible person easier.
+
+> The problem is not simply finding someone nearby. It is finding someone traveling in the same direction, at a compatible time, with a practical pickup.
+
+---
 
 ## Product
 
-The primary product is a mobile-first experience for planned and recurring commutes. Drivers and riders describe when and where they expect to travel, and the system recommends compatible commuters based on route and schedule information. Users remain in control: the system recommends matches rather than automatically assigning rides.
+Seawolf Rides is primarily designed for **planned and recurring rides**, not instant commercial dispatch.
 
-## Core User Flow
+Users describe when and where they expect to travel. The system then evaluates route and schedule compatibility and recommends commuters who could realistically share the trip.
 
-```text
-Driver or rider creates a planned or recurring commute
-                         ↓
-System compares schedules and routes
-                         ↓
-Compatible commuters are recommended
-                         ↓
-Rider requests a ride
-                         ↓
-Driver accepts or rejects
-                         ↓
-Connected users coordinate the ride
-```
+The system recommends matches rather than automatically assigning people to one another.
+
+The main product idea is:
+
+> **Schedule compatibility + route compatibility → practical shared commute**
+
+The goal is to help users:
+
+- plan rides ahead of time,
+- find compatible commuters without manually searching through many people,
+- coordinate recurring carpools,
+- and potentially reduce commuting costs together.
+
+---
 
 ## Target Users
 
 ### Drivers
 
-A driver is a Stony Brook commuter who already plans to drive to or from campus, has one or more available seats, and may be willing to make a limited detour to pick up another commuter. Drivers should control how much additional travel they are willing to accept and may offset some gas, toll, or parking costs through cost sharing.
+A driver is a Stony Brook commuter who already plans to drive to or from campus and may have unused seats.
+
+Drivers want to:
+
+- fill an available seat,
+- control how much additional detour they are willing to accept,
+- find dependable recurring riders,
+- potentially offset gas, toll, or parking costs.
 
 ### Riders
 
-A rider is a Stony Brook commuter who needs a planned or recurring ride and wants to find someone already traveling along a compatible route. A shared commute may offer a less expensive alternative to a commercial rideshare service.
+A rider is a Stony Brook commuter who needs transportation to or from campus.
 
-## Core Semester Scope
+Riders want to:
 
-### Accounts and Identity
+- find drivers whose routes are actually compatible,
+- find rides that fit their schedules,
+- avoid repeatedly searching through group chats or posts,
+- reduce reliance on expensive commercial rideshares,
+- find dependable recurring transportation.
 
-- Account creation
-- Login and logout
-- Persistent authentication or session
-- Stony Brook email verification
-- Basic user profile
+---
 
-A verified `@stonybrook.edu` address establishes community affiliation. It does not, by itself, prove that a user is currently enrolled as a student.
+## Basis for the User Needs
 
-### Commute Profiles
+These requirements are currently based on our team's understanding of the commuting problem and **informal observations of how university students already look for rides through online communities such as Reddit, student chats, and similar forums**.
 
-Users should be able to create and manage commute profiles containing information such as:
+Students already attempt to connect with people traveling between similar locations. The difficult part is finding the specific person whose:
 
-- Driver or rider role
-- Origin and destination
-- Recurring days
-- Departure time and/or arrival time
-- Time flexibility
-- Active or inactive status
+- route,
+- day,
+- timing,
+- available seats,
+- and willingness to detour
 
-Drivers may additionally specify available seats and their maximum acceptable detour.
+all line up.
 
-### Matching and Discovery
+Seawolf Rides is intended to automate that filtering and matching process.
 
-The matching system should:
+These observations are **not being presented as formal user-study results**. More structured user feedback can be collected later in the project.
 
-1. Filter obviously incompatible commutes using schedule and location information.
-2. Evaluate schedule compatibility.
-3. Evaluate route compatibility.
-4. Estimate the additional driver detour.
-5. Reject matches above the driver's maximum detour.
-6. Rank the remaining compatible matches.
+---
 
-Users should then be able to review recommendations using relevant information such as an approximate starting area, schedule compatibility, estimated detour, and seat availability.
+## User Stories
 
-### Ride Requests
+### Driver
 
-The planned basic request states are:
+> As a driver, I want to set my available seats and maximum detour so that I only receive practical rider matches.
+
+### Rider
+
+> As a rider, I want to find drivers whose routes and schedules match mine so that I can plan a realistic commute.
+
+### Matched Commuter
+
+> As a matched commuter, I want to coordinate pickup details so that the ride can actually happen.
+
+### Additional Working Stories
+
+> As a commuter, I want my commute information to persist so that I do not have to recreate it every time I open the app.
+
+> As a rider, I want recommended drivers ranked by compatibility so that I do not have to manually contact many people.
+
+> As a commuter, I want my exact home location protected from unmatched users so that sensitive location information is not unnecessarily exposed.
+
+---
+
+## Core User Flow
+
+```text
+Create account
+      ↓
+Create planned or recurring commute
+      ↓
+System compares schedules and routes
+      ↓
+Compatible commuters are recommended
+      ↓
+Rider sends ride request
+      ↓
+Driver accepts or rejects
+      ↓
+Connected users coordinate pickup
+```
+
+Matching occurs before users need to manually contact one another.
+
+---
+
+# V1 Requirements
+
+The following requirements define the current **core semester scope**.
+
+## Accounts and Identity
+
+Users should be able to:
+
+- create an account,
+- log in and log out,
+- remain authenticated across reasonable app restarts,
+- verify a Stony Brook email address,
+- maintain a basic user profile.
+
+A verified `@stonybrook.edu` email establishes Stony Brook community affiliation. It does not by itself prove current student enrollment.
+
+---
+
+## Commute Profiles
+
+Users should be able to create and manage a driver or rider commute.
+
+A commute should contain information such as:
+
+- driver or rider role,
+- origin,
+- campus destination,
+- recurring days,
+- departure time and/or arrival time,
+- time flexibility,
+- active or inactive status.
+
+Drivers should additionally be able to specify:
+
+- available seats,
+- maximum acceptable detour.
+
+---
+
+## Matching and Discovery
+
+The system should:
+
+1. Filter obviously incompatible commutes by day and timing.
+2. Filter candidates using general location information.
+3. Evaluate schedule compatibility.
+4. Evaluate route compatibility.
+5. Estimate the driver's additional pickup detour.
+6. Reject candidates above the driver's maximum detour.
+7. Rank the remaining compatible matches.
+8. Present recommended matches to the rider.
+
+Useful match information may include:
+
+- approximate starting area,
+- overlapping commute days,
+- timing compatibility,
+- estimated additional detour,
+- available seats.
+
+---
+
+## Ride Requests
+
+A rider should be able to send a request to a recommended driver.
+
+A driver should be able to:
+
+- view a pending request,
+- accept it,
+- reject it.
+
+A rider should be able to cancel a request when applicable.
+
+Current planned request states are:
 
 ```text
 PENDING
@@ -89,21 +234,106 @@ REJECTED
 CANCELLED
 ```
 
-The detailed ride lifecycle and whether an acceptance applies to one ride or a recurring relationship remain open design questions.
+The exact recurring-ride lifecycle will be finalized during later design work.
 
-### Messaging
+---
 
-Basic messaging is planned so connected users can coordinate pickup details, timing, delays, ride details, and cost sharing. Messaging is part of the semester scope, but it is not required to prove the first end-to-end MVP.
+## Messaging
 
-### Mobile-First Experience
+Connected users should be able to exchange basic messages for coordination.
 
-Seawolf Rides is designed as a mobile-first application. Its main interactions—planning rides, checking matches, responding to requests, coordinating pickup, and receiving ride-related updates—should work well on a phone.
+Examples include:
 
-## Matching Concept
+- exact pickup location,
+- timing,
+- delays,
+- ride details,
+- cost-sharing discussion.
 
-Route and schedule compatibility is the core technical feature. The application should eventually consider recurring days, departure and arrival timing, time flexibility, driver and rider origins, destination, seat availability, and the driver's maximum detour.
+Advanced chat features such as typing indicators, media sharing, or read receipts are not required.
 
-For example:
+---
+
+## Mobile-First Experience
+
+Seawolf Rides is being designed as a **mobile-first application**.
+
+The core workflow should be practical on a phone, including:
+
+- creating a commute,
+- checking matches,
+- responding to requests,
+- coordinating pickup,
+- receiving ride-related updates.
+
+---
+
+## Quality Requirements
+
+The core product should also satisfy several non-functional requirements.
+
+### Usability
+
+- The main ride-planning workflow should be practical to complete from a mobile device.
+- Common actions should not require unnecessary steps.
+
+### Persistence
+
+- User, commute, and ride-request data should persist between sessions.
+
+### Privacy
+
+- Exact residential locations should not be exposed to unrelated or unmatched users.
+
+### Reliability
+
+- A failed routing or external-service request should not crash the mobile application.
+- Duplicate actions should not corrupt ride-request state.
+
+### Testability
+
+- Schedule compatibility, route compatibility, and detour calculations should be testable independently from the UI.
+- Matching behavior should initially use deterministic rules so results can be explained and tested.
+
+---
+
+# Matching Workflow
+
+The expected system workflow is:
+
+```text
+Driver + rider create commute profiles
+                ↓
+        Filter by day / time
+                ↓
+      Filter by general location
+                ↓
+       Check route compatibility
+                ↓
+      Calculate driver detour
+                ↓
+    Remove incompatible candidates
+                ↓
+        Rank remaining matches
+                ↓
+       Rider reviews recommendations
+                ↓
+          Rider sends request
+                ↓
+        Driver accepts / rejects
+                ↓
+         Users coordinate pickup
+```
+
+This allows the system to reduce the number of expensive routing calculations by first eliminating clearly incompatible candidates.
+
+---
+
+## Matching Example
+
+Route and schedule compatibility are the core technical features.
+
+Example:
 
 ```text
 Driver normal commute:       72 minutes
@@ -114,96 +344,290 @@ Driver maximum detour:       10 minutes
 Result: compatible
 ```
 
-The current preference is to begin with explicit, deterministic matching rules rather than machine learning.
-
-## Privacy
-
-Exact home locations should not be exposed to unrelated or unmatched users. Before a match is accepted, the mobile app may show an approximate area such as `Flushing, Queens`. After users connect, they can privately coordinate a specific pickup location.
-
-The precise location-sharing model—including what becomes visible and when—is still open and requires further product and privacy decisions.
-
-## Milestone 3 MVP
-
-The expected Milestone 3 MVP is the thinnest meaningful end-to-end demonstration of the product's core idea:
+Conceptually:
 
 ```text
-Driver signs in → Driver creates commute
+detour =
+route_with_pickup_time
+-
+normal_driver_route_time
+```
 
-Rider signs in  → Rider creates commute
+If the calculated detour is within the driver's acceptable limit and the schedules are compatible, the rider can be considered a potential match.
 
-System evaluates route + schedule compatibility
-                         ↓
+The current direction is to begin with explicit deterministic matching rules rather than machine learning.
+
+---
+
+# Privacy
+
+Seawolf Rides handles location information, so privacy is part of the product requirements.
+
+Current guiding principle:
+
+> Exact home locations should not be exposed to unmatched users.
+
+Before users connect, the app may display an approximate area such as:
+
+```text
+Flushing, Queens
+```
+
+instead of an exact residential address.
+
+After a ride is accepted, users can privately coordinate a more specific pickup location.
+
+The exact visibility rules will be finalized during later design work.
+
+---
+
+# Core Semester Scope
+
+The semester version currently aims to include:
+
+- mobile application,
+- Stony Brook account verification,
+- driver and rider commute profiles,
+- planned and recurring rides,
+- route compatibility,
+- schedule compatibility,
+- detour calculation,
+- ranked match recommendations,
+- ride requests,
+- accept/reject/cancel workflow,
+- basic messaging,
+- persistent shared data,
+- external map/routing integration.
+
+The planned carpool experience is the priority.
+
+---
+
+# Milestone 3 MVP
+
+The Milestone 3 MVP should be the thinnest meaningful end-to-end version that proves the main product concept.
+
+```text
+Driver signs in
+      ↓
+Driver creates commute
+
+Rider signs in
+      ↓
+Rider creates commute
+
+System evaluates
+route + schedule compatibility
+      ↓
 Rider sees compatible driver
-                         ↓
+      ↓
 Core data persists
 ```
 
-Ride requests, messaging, payments, Trip Mode, advanced notifications, ratings, and on-the-go matching are not required to prove this first MVP unless the project scope changes.
+This proves that:
 
-## Stretch Features
+- the mobile client works,
+- authentication works,
+- shared data works,
+- commute creation works,
+- matching works,
+- routing integration works,
+- the core product can function end to end.
 
-### Stripe Cost Sharing
+Ride requests, messaging, Stripe, Trip Mode, ratings, and on-the-go matching are not required to prove the initial MVP.
 
-Stripe-based cost sharing is under consideration as a stretch feature, not part of the core MVP. The goal would be to let a rider make a suggested trip contribution toward gas, tolls, or parking—not to create a commercial taxi fare or driver earnings platform.
+---
 
-One possible future flow is:
+# Stretch Features
+
+These are not required for the core version.
+
+## Stripe Cost Sharing
+
+Stripe-based cost sharing may be explored after the main ride workflow works.
+
+The purpose would be to allow a rider to make a suggested contribution toward costs such as:
+
+- gas,
+- tolls,
+- parking.
+
+Possible flow:
 
 ```text
-Driver suggests trip contribution
-                 ↓
+Driver suggests contribution
+            ↓
 Rider accepts ride
-                 ↓
-Rider contributes toward gas, tolls, or parking
-                 ↓
-Payment is handled through Stripe
+            ↓
+Rider contributes toward trip costs
+            ↓
+Payment processed through Stripe
 ```
 
-Stripe Connect may be relevant if money needs to move between users, but no Stripe functionality has been selected or implemented.
+This should be treated as **cost sharing**, not a commercial taxi fare.
 
-### Trip Mode
+Stripe Connect may be relevant if money needs to move between users, but the exact payment design has not been finalized.
 
-Trip Mode is a possible supporting feature for automatic ride updates. A parked driver could start a trip and allow the system to send events such as "Trip started," updated pickup ETAs, approximate ten- and five-minute notices, and "Driver has arrived."
+---
 
-These should be system-generated trip events rather than messages a driver must type. Trip Mode is not implemented and is not required for the core MVP.
+## Trip Mode
 
-## Reach Goal: On-the-Go Matching
+Trip Mode is another possible stretch feature.
 
-A larger reach goal is to extend matching to rides arranged close to departure time—for example, when plans change, a driver leaves campus with an empty seat, or a rider unexpectedly needs transportation. Planned and recurring ride matching remains the primary purpose of Seawolf Rides, and on-the-go matching must not delay or compromise that experience.
+Before driving, a parked driver could press:
 
-### Driver Safety — Research Required
+```text
+Start Trip
+```
 
-Anything intended for use during active driving must minimize driver interaction. A moving driver should not need to type messages, browse matches, manage complex screens, or repeatedly interact with a phone.
+The application could then automatically send useful ride-status events such as:
 
-Future research may consider driving-safe notifications, automatic trip status messages, voice interaction, Apple CarPlay, and Android Auto. These capabilities are reach goals only; support is not currently available or implemented.
+- Trip started
+- Updated pickup ETA
+- Driver is approximately 10 minutes away
+- Driver is approximately 5 minutes away
+- Driver has arrived
 
-## Out of Scope for Core v1
+The driver should not need to type these messages while operating the vehicle.
+
+---
+
+# Reach Goal: On-the-Go Ride Matching
+
+A larger reach goal is to support rides arranged much closer to departure time.
+
+Possible examples include:
+
+- a student's plans unexpectedly changing,
+- a driver leaving campus with an empty seat,
+- a normal rider cancelling,
+- a student unexpectedly needing transportation.
+
+This would extend the same route-and-schedule matching concept to more spontaneous trips.
+
+However:
+
+> Planned and recurring ride matching remains the primary product.
+
+On-the-go matching should only be pursued after the planned experience works reliably.
+
+---
+
+## Driver Safety — Research Required
+
+Any feature intended for use during active driving must minimize driver interaction.
+
+A moving driver should not need to:
+
+- type messages,
+- browse potential riders,
+- manage complicated screens,
+- repeatedly interact with a phone.
+
+Possible future areas of research include:
+
+- automatic trip updates,
+- voice interaction,
+- Apple CarPlay,
+- Android Auto,
+- safe notification patterns.
+
+These are research/reach goals and are not currently implemented.
+
+---
+
+# Explicitly Out of Core v1
 
 The current core project does not aim to build:
 
-- Uber-style automatic dispatch
-- A commercial taxi marketplace
-- Automatic fares or dynamic pricing
-- Turn-by-turn navigation
-- Full live vehicle tracking
-- A driver earnings platform
-- Background-check infrastructure
-- Insurance-verification infrastructure
-- Machine-learning matching
-- Separate native Swift and Kotlin applications
-- A custom road-network or maps system
+- Uber-style automatic dispatch,
+- a commercial driver marketplace,
+- automatic commercial fares,
+- dynamic pricing,
+- turn-by-turn navigation,
+- full live vehicle tracking,
+- background-check infrastructure,
+- insurance-verification infrastructure,
+- machine-learning matching,
+- separate native Swift and Kotlin applications,
+- our own maps or road-network system.
 
-Some related ideas may be considered later as stretch features or research topics, but they are not core commitments.
+These boundaries exist to keep the semester project focused on the core matching and coordination problem.
 
-## Team Responsibilities
+---
 
-### Gio — Backend Engineer
+# Rough Architecture
+
+Our current high-level architecture is:
+
+```text
+┌─────────────────────────────┐
+│      Mobile Application     │
+│    React Native + Expo      │
+│                             │
+│         Owner: Ray          │
+└──────────────┬──────────────┘
+               │
+               ▼
+┌─────────────────────────────┐
+│   Backend / Business Logic  │
+│                             │
+│ APIs                        │
+│ Authentication              │
+│ Ride-request logic          │
+│ Application rules           │
+│                             │
+│         Owner: Gio          │
+└──────────┬───────────┬──────┘
+           │           │
+           ▼           ▼
+┌─────────────────┐   ┌────────────────────────┐
+│ Firebase / Data │   │    Matching Logic      │
+│                 │   │                        │
+│ Users           │   │ Schedule compatibility │
+│ Commutes        │   │ Location filtering     │
+│ Request state   │   │ Detour calculation     │
+│ Messaging       │   │ Match ranking          │
+│                 │   │                        │
+│ Owner: Kenny    │   │ Owner: Justin          │
+└─────────────────┘   └────────────┬───────────┘
+                                   │
+                                   ▼
+                         ┌─────────────────────┐
+                         │ Maps / Routing API  │
+                         │                     │
+                         │ Geocoding           │
+                         │ Route duration      │
+                         │ Detour estimates    │
+                         │                     │
+                         │ Integration: Justin │
+                         └─────────────────────┘
+```
+
+Firebase is our likely backend/data platform direction. Exact Firebase services and service boundaries will be finalized during Milestone 2.
+
+A final routing provider has not yet been selected.
+
+---
+
+# Team Responsibilities
+
+Each member has a primary ownership area.
+
+These roles are intended to avoid ambiguous ownership such as "everyone will code everything."
+
+## Gio — Backend Engineer
+
+Primary responsibilities:
 
 - APIs
 - Application and business logic
 - Authentication
 - Database integration
 
-### Justin — Matching & Geospatial Engineer
+## Justin — Matching & Geospatial Engineer
+
+Primary responsibilities:
 
 - Matching algorithm
 - Maps and routing integration
@@ -211,7 +635,9 @@ Some related ideas may be considered later as stretch features or research topic
 - Schedule compatibility
 - Detour calculations
 
-### Kenny — Platform & Integration Engineer
+## Kenny — Platform & Integration Engineer
+
+Primary responsibilities:
 
 - Database design
 - Messaging and notifications
@@ -219,7 +645,9 @@ Some related ideas may be considered later as stretch features or research topic
 - CI/CD
 - System integration
 
-### Ray — Mobile / Frontend Engineer
+## Ray — Mobile / Frontend Engineer
+
+Primary responsibilities:
 
 - Mobile UI
 - Navigation
@@ -227,52 +655,136 @@ Some related ideas may be considered later as stretch features or research topic
 - Client-side state
 - Overall UX
 
-These are primary ownership areas, not isolated silos. Everyone participates in architecture discussions, code review, testing, and integration.
+These are primary ownership areas, not isolated silos.
 
-## Current Direction and Decisions
+Everyone will still participate in:
 
-- The product is mobile-first and focused on the Stony Brook community.
+- architecture discussions,
+- code review,
+- testing,
+- integration,
+- shared product decisions.
+
+---
+
+# Current Decisions
+
+The team is currently aligned on the following:
+
+- Seawolf Rides is a mobile-first application.
+- The initial community is Stony Brook.
 - Planned and recurring rides are the primary use case.
-- Route and schedule compatibility is the core technical feature.
-- The system recommends matches rather than automatically assigning them.
-- Saving money through shared commuting is part of the motivation, not a commercial taxi model.
+- Route and schedule compatibility are the core technical features.
+- The system recommends matches rather than automatically assigning rides.
+- Shared commuting and potential cost savings are part of the product motivation.
 - On-the-go matching is a reach goal.
 - Driver interaction while moving should be minimized.
 
-### Current Technical Preferences
+---
 
-Implementation has not started, so these are preferences rather than confirmed technology choices:
+# Current Technical Direction
+
+These are working technical choices and may be refined during Milestone 2:
 
 - React Native
 - Expo
 - TypeScript
-- PostgreSQL
-- Mapbox
-- Deterministic matching
+- Firebase for authentication and shared application data
+- External map/routing provider, likely Mapbox or a similar service
+- Deterministic route/schedule matching
 
-## Open Questions
+Implementation details should not be considered final until the design phase.
+
+---
+
+# Open Questions
+
+Several product decisions still need to be finalized during design.
 
 - Who exactly can register?
-- Can one user create both driver and rider commutes?
+- Can one user maintain both driver and rider commutes?
 - Is Stony Brook always one endpoint in v1?
-- How should commute time flexibility be represented?
+- How should time flexibility be represented?
 - What exactly defines schedule compatibility?
 - What exactly defines route compatibility?
-- Does accepting a ride create a recurring relationship or a single ride instance?
+- What default detour limits should exist?
+- Does accepting a request establish one ride or a recurring relationship?
+- How should individual exceptions to recurring rides work?
 - Can multiple riders join one driver's commute?
-- When does messaging become available?
-- What precise location information becomes visible after matching?
-- Which Stripe or payment functionality, if any, is realistic for the semester?
-- How much Trip Mode or on-the-go functionality is realistic after the core product works?
+- When should messaging become available?
+- What exact location information becomes visible after matching?
+- Which Stripe functionality, if any, is realistic during the semester?
+- How much Trip Mode functionality is realistic?
+- How much on-the-go functionality is realistic after the core product works?
 
-## Why This Is a Semester Project
+These are open design questions, not missing requirements.
 
-Seawolf Rides goes beyond basic data-entry screens. The team must integrate mobile development, backend APIs, authentication, persistent shared data, and third-party geospatial and routing services. The matching feature requires concrete definitions for route proximity, schedule compatibility, detour limits, and ranking.
+---
 
-Later flows introduce ride-request state, messaging, privacy decisions, and potential concurrency when multiple riders request limited seats. The system must also handle third-party API failures and be tested, deployed, and integrated across team-owned components.
+# Why This Requires a Semester
 
-AI can accelerate implementation, but the team still has to define matching behavior, privacy rules, ride state, edge cases, architecture, testing, and product tradeoffs.
+Seawolf Rides is more than a basic CRUD application.
 
-## Development
+The project combines:
 
-Implementation and development setup have not started. Setup, run, and test instructions will be added here once the repository contains the corresponding code and configuration.
+- mobile development,
+- backend APIs,
+- authentication,
+- persistent shared data,
+- Firebase integration,
+- third-party routing APIs,
+- geospatial matching,
+- schedule matching,
+- ride-request state,
+- messaging,
+- location privacy,
+- testing,
+- deployment,
+- system integration.
+
+The team must also make product and engineering decisions such as:
+
+- What makes two commutes actually compatible?
+- How much additional detour is reasonable?
+- What location information should unmatched users see?
+- How should recurring rides be represented?
+- What happens when multiple riders request the final available seat?
+- What happens when an external routing service fails?
+- How do we test matching logic independently from the map provider?
+
+These decisions require requirements work, design, implementation, integration, testing, and iteration across the semester.
+
+AI can accelerate implementation, but it cannot decide the correct matching rules, privacy model, ride lifecycle, architecture, or product tradeoffs for the team.
+
+---
+
+# Milestone 1 Artifacts
+
+This README serves as the written Milestone 1 proposal and requirements document.
+
+The Milestone 1 artifacts currently include:
+
+- problem statement,
+- target users,
+- product proposal,
+- user stories,
+- functional requirements,
+- quality requirements,
+- v1 scope,
+- explicit out-of-scope items,
+- stretch and reach goals,
+- matching workflow,
+- named team responsibilities,
+- rough architecture sketch,
+- open design questions,
+- semester-scope justification.
+
+The accompanying Milestone 1 presentation summarizes these decisions for the project review.
+
+---
+
+# Development
+
+Implementation and development setup are still being established.
+
+Setup, run, test, and deployment instructions will be added once the corresponding code and configuration exist in the repository.
