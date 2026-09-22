@@ -1,0 +1,45 @@
+flowchart TB
+    User["Stony Brook commuter"]
+
+    subgraph Client["Mobile client — Ray"]
+        Mobile["React Native + Expo app\nUI, navigation, client state"]
+    end
+
+    subgraph Application["Application and trusted logic — Gio"]
+        Boundary["Backend boundary to be selected\nserver, serverless functions, or hybrid"]
+        Auth["Authentication and authorization"]
+        Requests["Commute and ride-request rules"]
+        Messaging["Messaging authorization"]
+    end
+
+    subgraph Geo["Matching and routing — Justin"]
+        Matching["Deterministic matching engine\nschedule, direction, seats, detour, ranking"]
+        RoutingAdapter["Routing adapter"]
+    end
+
+    subgraph Platform["Data and platform — Kenny"]
+        Firebase[("Likely Firebase services\nauthentication and persistent shared data")]
+        CI["Planned CI\nlint, test, build"]
+    end
+
+    Routing["External routing provider\nnot yet selected"]
+
+    User --> Mobile
+    Mobile -->|"sign in / verify email"| Auth
+    Mobile -->|"trusted operations"| Boundary
+    Mobile -.->|"possible direct SDK access\nfor authorized operations"| Firebase
+    Boundary --> Auth
+    Boundary --> Requests
+    Boundary --> Messaging
+    Boundary -->|"validated reads and writes"| Firebase
+    Boundary -->|"match request / candidate data"| Matching
+    Matching -->|"route estimates for filtered candidates"| RoutingAdapter
+    RoutingAdapter -->|"geocoding, duration, route"| Routing
+    Matching -->|"recommendations"| Boundary
+    Auth -->|"identity and verification state"| Firebase
+    Messaging -->|"authorized messages"| Firebase
+    CI -.->|"checks selected implementation"| Mobile
+    CI -.->|"checks selected implementation"| Boundary
+
+    classDef proposed stroke-dasharray: 5 5
+    class Boundary,Firebase,Routing,CI proposed
