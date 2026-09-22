@@ -19,7 +19,7 @@ flowchart TB
 
     subgraph Platform["Data and platform — Kenny"]
         Firebase[("Likely Firebase services\nauthentication and persistent shared data")]
-        CI["Planned CI\nlint, test, build"]
+        CI["GitHub Actions CI\nlint, type-check, test, export"]
     end
 
     Routing["External routing provider\nnot yet selected"]
@@ -42,4 +42,4 @@ flowchart TB
     CI -.->|"checks selected implementation"| Boundary
 
     classDef proposed stroke-dasharray: 5 5
-    class Boundary,Firebase,Routing,CI proposed
+    class Boundary,Firebase,Routing proposed

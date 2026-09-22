@@ -1,0 +1,15 @@
+{
+  "name": "seawolf-rides",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "24.21.0"
+  },
+  "scripts": {
+    "dev": "npm --prefix mobile run start",
+    "lint": "npm --prefix mobile run lint",
+    "typecheck": "npm --prefix mobile run typecheck",
+    "test": "npm --prefix mobile run test",
+    "build": "npm --prefix mobile run build"
+  }
+}

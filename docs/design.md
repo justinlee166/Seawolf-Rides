@@ -34,7 +34,7 @@ flowchart TB
     end
     subgraph Platform["Data and platform — Kenny"]
         Firebase[("Likely Firebase services\nauthentication and persistent shared data")]
-        CI["Planned CI\nlint, test, build"]
+        CI["GitHub Actions CI\nlint, type-check, test, export"]
     end
     Routing["External routing provider\nnot yet selected"]
     User --> Mobile
@@ -52,7 +52,7 @@ flowchart TB
     Auth -->|"identity and verification state"| Firebase
     Messaging -->|"authorized messages"| Firebase
     classDef proposed stroke-dasharray: 5 5
-    class Boundary,Firebase,Routing,CI proposed
+    class Boundary,Firebase,Routing proposed
 ```
 
 The editable source is [architecture.mmd](architecture.mmd). Dashed components or connections represent planned or unresolved implementation choices.
@@ -69,15 +69,17 @@ The editable source is [architecture.mmd](architecture.mmd). Dashed components o
 
 | Technology | Purpose | Reason for selection | Decision status |
 |---|---|---|---|
-| React Native | Cross-platform mobile framework | Supports a single mobile-first client codebase | Working direction from M1; not initialized |
-| Expo | React Native development and testing tooling | Reduces native setup overhead for a four-person semester team | Working direction from M1; not initialized |
-| TypeScript | Client and application language | Static types can keep shared entities and matching interfaces consistent | Working direction from M1; not initialized |
+| React Native 0.86.3 | Cross-platform mobile framework | Supports a single mobile-first client codebase | Initialized in the mobile application; no product features implemented |
+| Expo SDK 57.0.24 | React Native development and testing tooling | Reduces native setup overhead and supports the initial Expo Go workflow | Initialized with the blank TypeScript template |
+| TypeScript 6.0.3 | Client and application language | Static types can keep shared entities and matching interfaces consistent | Initialized with strict checking |
+| Node.js 24.21.0 LTS | Shared development and CI runtime | Pins every operating system and CI to one Expo-compatible runtime | Selected and recorded in `.nvmrc` and package engines |
+| npm | Dependency and script management | Ships with Node.js and provides reproducible installs from the committed lockfile | Selected; application lockfile is maintained in `mobile/` |
 | Firebase | Authentication and persistent shared-data platform | Managed services may reduce infrastructure work and support shared mobile data | Likely direction; exact services and boundaries unresolved |
 | Trusted server-side runtime | Protected business logic, routing credentials, and concurrency-sensitive updates | Prevents clients from bypassing critical validation and protects secrets | Required responsibility; server versus serverless unresolved |
 | External routing API | Geocoding, route duration, and detour estimates | Avoids building a road-network and navigation engine | Required capability; provider unresolved |
-| GitHub Actions | Automated lint, test, and build checks | Fits the existing GitHub repository and makes pull-request checks reproducible | Planned; no workflow exists |
+| GitHub Actions | Automated lint, type-check, test, and Expo export checks | Fits the existing GitHub repository and makes pull-request checks reproducible | Workflow configured; first hosted run not yet verified |
 
-The repository contains no application manifest or configuration proving that any candidate technology is installed or operational.
+The repository now contains the minimal Expo application and development checks. Firebase, trusted server-side logic, routing, and all product features remain uninitialized.
 
 ## 4. Component Responsibilities
 
@@ -198,7 +200,7 @@ M3 should handle failures along its authentication, commute, matching, routing, 
 
 ## 10. M2 Minimal Prototype
 
-**Status: proposed, not implemented or verified.** The repository currently has documentation only.
+**Status: proposed, not implemented or verified.** The repository now has a runnable Expo development foundation, but it does not yet implement this persisted-data prototype.
 
 The deliberately small prototype should initialize an Expo/React Native TypeScript application with one screen. A user action loads one sample commute through the team's selected application/data access path from configured persistent Firebase data and displays role, approximate area, recurring days, and time preference. The sample must not contain a real residential address.
 
@@ -234,7 +236,7 @@ The labels below are descriptive traceability identifiers introduced by this M2 
 
 ## 12. Development and CI Plan
 
-The current repository contains the homepage and documentation only. It has no application source, package manifest, test configuration, or GitHub Actions workflow. CI is therefore **pending**, not passing.
+The repository contains a minimal Expo/React Native TypeScript application in `mobile/`, npm scripts for linting, type-checking, testing, and a non-publishing Expo export, plus a GitHub Actions workflow that runs the same checks. These checks have been validated locally; the first hosted GitHub Actions run remains unverified.
 
 When implementation begins, create only the directories required by the chosen structure—for example, a mobile directory for the Expo app and a backend directory only if a separate backend is selected. Keep provider-independent matching logic separated from UI and routing-adapter code. Document environment configuration without committing secrets.
 
@@ -248,7 +250,7 @@ Development workflow:
 6. Add integration tests for authentication/data rules and the selected persistence path using safe test configuration or emulators where supported.
 7. Add an end-to-end smoke test for the M3 path after the components are integrated.
 
-The initial GitHub Actions skeleton should install dependencies with the committed lockfile and run the repository's real lint, test, and build/type-check scripts on pull requests and main. It should be introduced with the application scaffold, not as an empty workflow.
+The initial GitHub Actions workflow installs dependencies from `mobile/package-lock.json` and runs the repository's real lint, type-check, test, and export scripts on pull requests and pushes to `main`. It has no deployment or external-service credentials.
 
 ## 13. Open Design Decisions
 
@@ -316,11 +318,10 @@ The team has not yet held or recorded an approval meeting for the following choi
 To finish M2, the team should:
 
 1. Hold and record an architecture decision session covering backend execution, Firebase services, routing provider evaluation criteria, and the matching interface.
-2. Initialize the React Native/Expo TypeScript mobile project and commit its lockfile and verified setup instructions.
-3. Configure safe development/test Firebase resources or emulators and document environment setup without secrets.
-4. Implement the narrow persisted-sample-commute prototype and verify it from a clean clone.
-5. Add real lint, test, and build/type-check scripts, then a GitHub Actions workflow that invokes them.
-6. Add at least one automated prototype test and verify the workflow on a pull request.
-7. Update this design's decision statuses and architecture boundaries to reflect approvals and observed prototype results.
+2. Have a second developer verify the documented Expo setup from a clean clone and confirm Expo Go connectivity on a physical device.
+3. Verify the GitHub Actions workflow on a pull request.
+4. Configure safe development/test Firebase resources or emulators and document environment setup without secrets.
+5. Implement the narrow persisted-sample-commute prototype and add an automated test for its data-to-view or application/data boundary.
+6. Update this design's decision statuses and architecture boundaries to reflect approvals and observed prototype results.
 
-Steps 2–3 can proceed in parallel after the initial boundary decision; routing-provider research and matching-interface fixtures can also proceed in parallel without implementing the full algorithm. Ride requests, messaging, full ranking, Stripe, Trip Mode, and on-the-go matching are later work and should not delay the mandatory M2 prototype and CI foundation.
+Steps 2–3 can proceed in parallel; after the initial boundary decision, Firebase setup and routing-provider research can also proceed in parallel without implementing the full matching algorithm. Ride requests, messaging, full ranking, Stripe, Trip Mode, and on-the-go matching are later work and should not delay the mandatory M2 prototype.
