@@ -2,11 +2,11 @@
 
 ## 1. Purpose and Scope
 
-This document translates the [Milestone 1 proposal and requirements](requirements.md) into a technical design that can guide setup and implementation. It defines conceptual components, responsibilities, data and interaction models, privacy constraints, risks, and decisions the team must make. It does not claim that the proposed system is implemented.
+This document translates the [Milestone 1 proposal and requirements](requirements.md) into a technical design that guides setup and implementation. It distinguishes the implemented M2 foundation and prototype from proposed M3 and semester-v1 components, responsibilities, data models, privacy constraints, risks, and decisions the team must still make.
 
 The milestones intentionally have different scopes:
 
-- **M2 prototype:** a small, runnable technical foundation proving that the selected client and persistence path can communicate. It is proposed below but is not yet present.
+- **M2 prototype:** an implemented, runnable Expo application that proves a restricted Firestore persistence path and demonstrates the planned Match, Schedule, and Chats experience with clearly isolated local fixtures.
 - **M3 MVP:** authentication, driver and rider commute creation, route and schedule compatibility, one displayed match result, and persistent relevant data.
 - **Core semester v1:** the M3 path plus ranked recommendations, ride requests, accept/reject/cancel behavior, basic messaging, and the complete planned carpool workflow.
 
@@ -22,84 +22,88 @@ flowchart TB
     subgraph Client["Mobile client — Ray"]
         Mobile["React Native + Expo app\nUI, navigation, client state"]
     end
-    subgraph Application["Application and trusted logic — Gio"]
+    subgraph Application["Future application and trusted logic — Gio"]
         Boundary["Backend boundary to be selected\nserver, serverless functions, or hybrid"]
-        Auth["Authentication and authorization"]
-        Requests["Commute and ride-request rules"]
-        Messaging["Messaging authorization"]
+        Auth["Authentication and authorization\nfuture / not implemented"]
+        Requests["Commute and ride-request rules\nfuture / not implemented"]
+        Messaging["Messaging authorization\nfuture / not implemented"]
     end
-    subgraph Geo["Matching and routing — Justin"]
-        Matching["Deterministic matching engine\nschedule, direction, seats, detour, ranking"]
-        RoutingAdapter["Routing adapter"]
+    subgraph Geo["Future matching and routing — Justin"]
+        Matching["Deterministic matching engine\nfuture / not implemented"]
+        RoutingAdapter["Routing adapter\nfuture / not implemented"]
     end
     subgraph Platform["Data and platform — Kenny"]
-        Firebase[("Likely Firebase services\nauthentication and persistent shared data")]
+        Firestore[("Cloud Firestore\nM2 sample commute persistence")]
+        FutureAuth["Firebase Authentication\nfuture / not implemented"]
         CI["GitHub Actions CI\nlint, type-check, test, export"]
     end
-    Routing["External routing provider\nnot yet selected"]
+    Routing["External routing provider\nfuture / not selected"]
     User --> Mobile
-    Mobile -->|"sign in / verify email"| Auth
-    Mobile -->|"trusted operations"| Boundary
-    Mobile -.->|"possible direct SDK access\nfor authorized operations"| Firebase
-    Boundary --> Auth
-    Boundary --> Requests
-    Boundary --> Messaging
-    Boundary -->|"validated reads and writes"| Firebase
-    Boundary -->|"match request / candidate data"| Matching
-    Matching -->|"route estimates for filtered candidates"| RoutingAdapter
-    RoutingAdapter -->|"geocoding, duration, route"| Routing
-    Matching -->|"recommendations"| Boundary
-    Auth -->|"identity and verification state"| Firebase
-    Messaging -->|"authorized messages"| Firebase
+    Mobile -->|"implemented restricted get\ncommutes/sample-commute-001"| Firestore
+    Mobile -.->|"future sign in / verification"| Auth
+    Mobile -.->|"future trusted operations"| Boundary
+    Boundary -.-> Auth
+    Boundary -.-> Requests
+    Boundary -.-> Messaging
+    Boundary -.->|"future validated product data"| Firestore
+    Boundary -.->|"future match request / candidates"| Matching
+    Matching -.->|"future route estimates"| RoutingAdapter
+    RoutingAdapter -.->|"future geocoding and routes"| Routing
+    Matching -.->|"future recommendations"| Boundary
+    Auth -.->|"future identity service"| FutureAuth
+    Messaging -.->|"future persistent messages"| Firestore
+    CI -.->|"checks selected implementation"| Mobile
+    CI -.->|"checks selected implementation"| Boundary
     classDef proposed stroke-dasharray: 5 5
-    class Boundary,Firebase,Routing proposed
+    class Boundary,Auth,Requests,Messaging,Matching,RoutingAdapter,FutureAuth,Routing proposed
 ```
 
-The editable source is [architecture.mmd](architecture.mmd). Dashed components or connections represent planned or unresolved implementation choices.
+The editable source is [architecture.mmd](architecture.mmd). The solid mobile-to-Firestore path and CI component are implemented for M2; dashed components or connections represent planned or unresolved choices.
 
-- **Mobile frontend:** collects account and commute input, requests matches, and presents recommendations and coordination workflows. It must not be trusted to enforce authorization or seat limits.
+- **Mobile frontend:** the implemented Expo application provides Match, Schedule, and Chats prototype screens. Except for the saved-commute read, their search, recommendations, requests, rides, route placeholders, conversations, and locally appended messages are simulated frontend state. A future product client must not be trusted to enforce authorization or seat limits.
 - **Backend/application logic:** validates requests, enforces state transitions and authorization, coordinates matching, and protects operations requiring secrets or atomic updates. Its deployment form is unresolved.
-- **Authentication:** establishes identity, verifies an `@stonybrook.edu` email, and supplies identity claims used by authorization. Email verification is not enrollment or safety verification.
-- **Persistent data:** retains users, commutes, request state, recommendations if stored, conversations, and messages. Firebase is the likely direction, but services and schema are not selected.
+- **Authentication:** remains unimplemented. The planned responsibility is to establish identity, verify an `@stonybrook.edu` email, and supply identity claims used by authorization. Email verification would not be enrollment or safety verification.
+- **Persistent data:** Cloud Firestore is selected and implemented for the M2 proof: the mobile client reads the restricted `commutes/sample-commute-001` document. The full M3 schema, writes, indexes, and persistence boundaries remain unresolved.
 - **Matching engine:** applies deterministic schedule, geographic, direction, seat, detour, and ranking rules independently of the UI and behind a routing abstraction.
 - **External routing provider:** supplies geocoding and route/travel-duration estimates. No provider has been selected.
-- **Messaging subsystem:** permits basic coordination between authorized connected users. Its storage and delivery mechanism remain open.
+- **Messaging subsystem:** the M2 screens use local fixtures and component state only. Authorization, storage, and delivery remain future work.
 
 ## 3. Technology Stack
 
 | Technology | Purpose | Reason for selection | Decision status |
 |---|---|---|---|
-| React Native 0.86.3 | Cross-platform mobile framework | Supports a single mobile-first client codebase | Initialized in the mobile application; no product features implemented |
+| React Native 0.86.3 | Cross-platform mobile framework | Supports a single mobile-first client codebase | Implemented for the M2 technical and UX prototype |
 | Expo SDK 57.0.24 | React Native development and testing tooling | Reduces native setup overhead and supports the initial Expo Go workflow | Initialized with the blank TypeScript template |
 | TypeScript 6.0.3 | Client and application language | Static types can keep shared entities and matching interfaces consistent | Initialized with strict checking |
 | Node.js 24.21.0 LTS | Shared development and CI runtime | Pins every operating system and CI to one Expo-compatible runtime | Selected and recorded in `.nvmrc` and package engines |
 | npm | Dependency and script management | Ships with Node.js and provides reproducible installs from the committed lockfile | Selected; application lockfile is maintained in `mobile/` |
-| Firebase | Authentication and persistent shared-data platform | Managed services may reduce infrastructure work and support shared mobile data | Likely direction; exact services and boundaries unresolved |
+| Firebase JavaScript SDK and Cloud Firestore | M2 persistent sample-commute read | Provides a managed persistence proof that works with the Expo client | Selected and implemented for the restricted M2 read; broader product schema and writes remain future work |
+| Firebase Authentication | Candidate identity and Stony Brook email-verification service | Could integrate with the selected Firebase platform | Not implemented; authentication design remains open |
 | Trusted server-side runtime | Protected business logic, routing credentials, and concurrency-sensitive updates | Prevents clients from bypassing critical validation and protects secrets | Required responsibility; server versus serverless unresolved |
 | External routing API | Geocoding, route duration, and detour estimates | Avoids building a road-network and navigation engine | Required capability; provider unresolved |
-| GitHub Actions | Automated lint, type-check, test, and Expo export checks | Fits the existing GitHub repository and makes pull-request checks reproducible | Workflow configured; first hosted run not yet verified |
+| GitHub Actions | Automated install, lint, type-check, test, and Expo export checks | Fits the existing GitHub repository and makes pull-request checks reproducible | Implemented and successfully run on `main` |
 
-The repository now contains the minimal Expo application and development checks. Firebase, trusted server-side logic, routing, and all product features remain uninitialized.
+The repository contains the Expo application, the restricted Firestore read, an interactive frontend-only product prototype, automated tests, and working CI. Authentication, trusted server-side product logic, matching, routing, and persisted ride-request or messaging workflows remain unimplemented.
 
 ## 4. Component Responsibilities
 
 | Component | Inputs | Outputs | Responsibility and boundary | Primary owner |
 |---|---|---|---|---|
-| Mobile client | User input, authenticated session, application data | Validated requests and rendered screens | Mobile UI, navigation, forms, local state, loading/error states; no authoritative access decisions | Ray |
+| Mobile client | User input, local fixtures, and the M2 Firestore sample | Rendered screens and local prototype state | Implements the Match, Schedule, and Chats UX prototype plus real saved-commute loading states; no authoritative access decisions | Ray |
 | Authentication/authorization | Credentials, verification state, user identity | Session/identity and access decisions | Authenticate accounts, require verified Stony Brook email where appropriate, and authorize protected operations | Gio, with Kenny on platform rules |
 | Application logic | Authenticated commands and stored entities | Validated state changes and responses | Enforce invariants, request transitions, data validation, and orchestration; deployment mechanism remains open | Gio |
-| Persistent-data layer | Validated reads/writes | Durable entities and query results | Store shared state, define indexes and access rules, and support safe updates | Kenny |
+| Persistent-data layer | M2 fixed document read; future validated reads/writes | Persisted sample commute today; broader durable entities later | Firestore stores the restricted M2 sample; full schemas, indexes, rules, and safe updates remain future responsibilities | Kenny |
 | Matching engine | Rider commute, candidate driver commutes, route estimates, configured rules | Explainable compatibility results and rankings | Pure deterministic filtering/scoring where possible; no UI or provider-specific logic | Justin |
 | Routing adapter | Normalized origins, pickups, destinations | Normalized geocode, route, duration, and error results | Isolate provider API formats, credential handling, limits, and failures from matching rules | Justin, with Gio on backend boundary |
 | Ride-request coordinator | User identity, target commutes, current capacity/status | Approved state transition or explicit error | Enforce authorization, prevent duplicates, and handle final-seat concurrency | Gio, with Kenny on transactions |
 | Messaging subsystem | Authorized participants, conversation and message data | Persisted messages available to participants | Limit access to allowed users and support basic coordination | Kenny, with Gio on authorization |
-| CI pipeline | Source and configuration | Lint, test, and build results | Run reproducible checks on pull requests and the main branch once code exists | Kenny |
+| CI pipeline | Source and configuration | Install, lint, type-check, test, and export results | Runs reproducible checks on pull requests and `main`; a hosted run on `main` has succeeded | Kenny |
 
 Ownership identifies the lead, not an isolated silo. Architecture, reviews, tests, and integration remain shared team work.
 
 ## 5. Proposed Data Model
 
-This is a logical model for discussion, not an implemented Firebase schema. Identifiers, collection layout, indexes, retention, and security rules remain to be designed.
+This is the proposed full-product logical model, not an implemented full Firestore schema. The only implemented M2 persistence shape is `commutes/sample-commute-001` with `role`, `approximateArea`, `recurringDays`, and `timePreference`. Identifiers, remaining collections, indexes, retention, and broader security rules still require design.
 
 | Entity | Important proposed fields | Relationships and notes |
 |---|---|---|
@@ -155,6 +159,8 @@ The matching module should accept normalized domain inputs and a routing interfa
 
 These are interaction responsibilities, not implemented endpoint names. Some authorized reads/writes may use Firebase client SDKs directly; trusted operations need server-side validation. The final boundary depends on the architecture decision.
 
+The implemented M2 exception is intentionally narrow: the mobile client uses the Firebase JavaScript SDK to get only `commutes/sample-commute-001`. It does not create, update, query, or delete product data. All Match recommendations, ride requests, scheduled rides, route placeholders, and Chats content are local prototype fixtures or component state.
+
 | Interaction | Proposed flow | Validation and authorization |
 |---|---|---|
 | Register/authenticate | Mobile submits credentials; authentication service establishes identity and email verification state | Restrict protected product access as agreed; never treat a client-provided email flag as authoritative |
@@ -179,7 +185,7 @@ A verified `@stonybrook.edu` address establishes control of a university-domain 
 
 Authorization must prevent users from reading or changing other users' private commutes, ride requests, conversations, or messages. Request state transitions and final-seat reservations require trusted enforcement rather than client-only checks. Logs and analytics should avoid unnecessary exact coordinates and message content. Data retention and account deletion policies require later definition.
 
-Routing API secrets, privileged Firebase credentials, and other server credentials must not be committed or embedded in a distributable mobile bundle. Environment-specific configuration should be documented using safe example files after services are selected. Firebase security rules, server validation, credential restrictions, and indexes must be implemented and tested before the relevant flows can be called secure.
+The six Firebase `EXPO_PUBLIC_*` values documented in `mobile/.env.example` are public client configuration embedded in the application bundle; they are not private server secrets. The local populated `mobile/.env` remains ignored. Routing API secrets, privileged Firebase credentials, and other server credentials must not be committed or embedded in a distributable mobile bundle. The M2 Firestore rules restrict the prototype read to the sample document, but broader Firebase security rules, server validation, credential restrictions, and indexes must be implemented and tested before future product flows can be called secure.
 
 ## 9. Reliability and Edge Cases
 
@@ -200,21 +206,21 @@ M3 should handle failures along its authentication, commute, matching, routing, 
 
 ## 10. M2 Minimal Prototype
 
-**Status: proposed, not implemented or verified.** The repository now has a runnable Expo development foundation, but it does not yet implement this persisted-data prototype.
+**Status: implemented and verified.** The technical heartbeat is a real Expo-to-Firestore read of the restricted `commutes/sample-commute-001` document. The app displays its `role`, `approximateArea`, `recurringDays`, and `timePreference` fields and handles initial, loading, success, missing-document, and recoverable-error states.
 
-The deliberately small prototype should initialize an Expo/React Native TypeScript application with one screen. A user action loads one sample commute through the team's selected application/data access path from configured persistent Firebase data and displays role, approximate area, recurring days, and time preference. The sample must not contain a real residential address.
+The app has also grown into a broader frontend-only UX prototype with Match, Schedule, and Chats tabs. This layer demonstrates the intended interaction model using typed local fixtures and component state: it does not perform matching, calculate routes, persist ride requests, or persist chat messages. Route visuals are placeholders, and no live traffic is presented.
 
-Acceptance criteria:
+Verified M2 evidence:
 
-1. A new developer can follow committed setup instructions and launch the application in the documented environment.
-2. The mobile screen renders and clearly distinguishes loading, success, empty, and recoverable error states.
-3. The success path reads a persisted sample commute rather than only a hard-coded in-component object.
-4. Configuration and credentials are excluded from version control and documented safely.
-5. At least one automated test covers data-to-view mapping or the selected application/data boundary.
-6. Repository scripts support lint, test, and build/type-check as appropriate, and GitHub Actions runs those exact scripts.
-7. A teammate verifies the documented clean-clone workflow.
+1. The Expo application runs and has been manually verified on a physical iPhone through Expo Go.
+2. The saved-commute success path reads persisted Firestore data rather than a hard-coded component object.
+3. Real initial, loading, success, missing-document, and recoverable-error states are implemented.
+4. The six required public client variables are documented in `mobile/.env.example`; the populated local `.env` is ignored.
+5. Automated tests cover sample-commute data-to-view/domain mapping.
+6. Root scripts run lint, type-check, tests, and a non-publishing Expo export/build check.
+7. GitHub Actions uses `npm ci` and those checks and has completed successfully on `main`.
 
-This prototype proves a technical foundation, not authentication, matching, routing, ride requests, or messaging. Those should not be claimed until separately implemented and verified.
+This prototype proves the mobile/persistence foundation and communicates the planned UX. It does not prove authentication, real matching, routing, persistent ride requests, persistent messaging, payments, or the full M3 backend workflow.
 
 ## 11. M1 Requirements to Architecture Mapping
 
@@ -236,9 +242,9 @@ The labels below are descriptive traceability identifiers introduced by this M2 
 
 ## 12. Development and CI Plan
 
-The repository contains a minimal Expo/React Native TypeScript application in `mobile/`, npm scripts for linting, type-checking, testing, and a non-publishing Expo export, plus a GitHub Actions workflow that runs the same checks. These checks have been validated locally; the first hosted GitHub Actions run remains unverified.
+The repository contains an Expo/React Native TypeScript application in `mobile/`, npm scripts for linting, type-checking, testing, and a non-publishing Expo export, plus a GitHub Actions workflow that runs the same checks. The checks pass locally, and the hosted workflow has completed successfully on `main`.
 
-When implementation begins, create only the directories required by the chosen structure—for example, a mobile directory for the Expo app and a backend directory only if a separate backend is selected. Keep provider-independent matching logic separated from UI and routing-adapter code. Document environment configuration without committing secrets.
+As implementation expands beyond M2, create only the directories required by the chosen structure—for example, a backend directory only if a separate backend is selected. Keep provider-independent matching logic separated from UI and routing-adapter code. Document environment configuration without committing secrets.
 
 Development workflow:
 
@@ -257,7 +263,7 @@ The initial GitHub Actions workflow installs dependencies from `mobile/package-l
 | Decision | Current working direction | Alternatives | What the team must resolve |
 |---|---|---|---|
 | Final backend architecture | Trusted logic plus selected direct client access | Dedicated server; Firebase Cloud Functions/serverless; hybrid | Deployment unit, request boundaries, local testing, cost, and ownership |
-| Specific Firebase services | Firebase for likely auth and shared data | Auth plus Firestore; Realtime Database; another managed platform | Services, environments, emulator use, rules, indexes, and pricing limits |
+| Firebase services beyond M2 Firestore | Firestore is selected for M2 persistence; authentication and trusted execution remain open | Firebase Authentication and Cloud Functions; another identity/server platform; hybrid | Identity service, trusted runtime, environments, emulators, broader rules, indexes, and pricing limits |
 | Routing provider | External provider; M1 mentions Mapbox or similar | Mapbox, Google Maps Platform, HERE, other viable provider | Coverage, directions/geocoding features, pricing, quotas, license, mobile/server credential model |
 | Schedule compatibility | Deterministic overlapping-day/time rules | Departure windows, arrival deadlines, mixed model | Time representation, time zone, flexibility semantics, inclusive boundaries |
 | Geographic prefilter | Broad location and direction filter before routing | Geohash/radius, corridor/bounding box, provider matrix | Privacy-preserving inputs, false negatives, query/index support |
@@ -267,7 +273,7 @@ The initial GitHub Actions workflow installs dependencies from `mobile/package-l
 | Seat reservation | Enforce trusted capacity on acceptance | Reserve on pending request; reserve only per occurrence | Transaction boundary, overbooking behavior, release rules |
 | Message authorization | Connected participants only | Access after match, request, or acceptance | Exact enabling state, conversation lifecycle, blocking/reporting expectations |
 | Location visibility | Approximate before connection; specific pickup after approved state | Different precision/staged disclosure models | Exact fields, precision, transition state, revocation and retention |
-| Mobile testing/distribution | Expo-based development | Expo Go, development builds, store/test distribution | Native dependency needs, supported devices, teammate/professor access |
+| Mobile testing/distribution | Expo Go is verified on a physical iPhone for M2 | Expo Go, development builds, store/test distribution | Future native dependency needs and the M3/team distribution approach |
 
 ### Architecture Decisions Requiring Team Agreement
 
@@ -281,11 +287,11 @@ The team has not yet held or recorded an approval meeting for the following choi
 4. **Impact:** determines repository layout, APIs, security rules, local development, deployment, integration testing, and Gio/Kenny's interface.
 5. **Participants:** Gio, Kenny, Justin, and Ray; Gio and Kenny should jointly document the selected boundary.
 
-#### Firebase service selection
+#### Firebase services beyond M2 persistence
 
-1. **Decide:** which Firebase services, if any, provide identity, persistence, trusted execution, and local emulation.
-2. **Proposed direction:** keep Firebase as the leading platform candidate while validating requirements against concrete services.
-3. **Alternatives:** a subset of Firebase paired with a custom API/database, or another managed platform if it better satisfies the agreed model.
+1. **Decide:** which services provide identity, trusted execution, and local emulation now that Firestore is selected for the M2 persistence proof.
+2. **Current status:** the Firebase JavaScript SDK and Firestore fixed-document read are implemented; Firebase Authentication and a trusted Firebase/server runtime are not.
+3. **Alternatives:** Firebase Authentication and Cloud Functions, Firestore paired with a custom trusted API, or another identity/server platform.
 4. **Impact:** shapes data queries, rules, concurrency, SDK usage, costs, testing, and environment configuration.
 5. **Participants:** Kenny and Gio lead; Justin validates matching-query needs and Ray validates mobile SDK implications.
 
@@ -313,15 +319,25 @@ The team has not yet held or recorded an approval meeting for the following choi
 4. **Impact:** changes the data model, indexes, transactions, UI states, authorization, matching tests, and routing volume.
 5. **Participants:** all four team members, with each component owner preparing concrete examples and edge cases.
 
-## 14. Next Steps
+## 14. AI Assistance and Human Decisions
 
-To finish M2, the team should:
+AI/Codex assisted with implementation scaffolding, code generation and refactoring, UI component implementation, Firestore integration, automated test creation and iteration, and documentation consistency review.
 
-1. Hold and record an architecture decision session covering backend execution, Firebase services, routing provider evaluation criteria, and the matching interface.
-2. Have a second developer verify the documented Expo setup from a clean clone and confirm Expo Go connectivity on a physical device.
-3. Verify the GitHub Actions workflow on a pull request.
-4. Configure safe development/test Firebase resources or emulators and document environment setup without secrets.
-5. Implement the narrow persisted-sample-commute prototype and add an automated test for its data-to-view or application/data boundary.
-6. Update this design's decision statuses and architecture boundaries to reflect approvals and observed prototype results.
+Human/team decisions defined the Seawolf Rides problem and user workflow; set the M2 prototype boundary versus the M3 MVP; selected React Native, Expo, TypeScript, and Firestore for the M2 persistence proof; defined the Match, Schedule, and Chats product structure; determined which location data should remain approximate or private before ride acceptance; and decided which M2 interactions are real versus simulated. The team also chose deterministic, explainable matching as the planned direction and placed real routing, authentication, messaging persistence, ride-request persistence, and payments in later milestones.
 
-Steps 2–3 can proceed in parallel; after the initial boundary decision, Firebase setup and routing-provider research can also proceed in parallel without implementing the full matching algorithm. Ride requests, messaging, full ranking, Stripe, Trip Mode, and on-the-go matching are later work and should not delay the mandatory M2 prototype.
+AI accelerated implementation and helped surface consistency issues, but it did not define the product requirements or independently approve product and architecture decisions. The team remains responsible for evaluating tradeoffs, approving unresolved decisions, reviewing generated work, and validating the result.
+
+## 15. Next Steps
+
+The shared development environment, Firestore technical heartbeat, frontend-only UX prototype, automated checks, physical-iPhone verification, and hosted CI run are complete for M2. Remaining team work is to review this evidence and decide whether the unresolved architecture items must be closed for the M2 submission or may be carried explicitly into M3.
+
+Genuine next decisions and M3 work include:
+
+1. Select the authentication implementation and Stony Brook email-verification flow.
+2. Approve the trusted backend execution model and its boundary with direct Firestore client access.
+3. Select a routing provider and define the routing-adapter credential boundary.
+4. Agree on schedule compatibility, geographic prefiltering, matching thresholds, ranking, and tie-breaking rules.
+5. Finalize recurring-relationship versus dated-ride modeling, seat reservation, location visibility, and message authorization.
+6. Implement and test the persisted M3 product workflow for users, commutes, matching results, requests, and later messaging.
+
+Ride requests, messaging persistence, full matching, routing, Stripe, Trip Mode, and on-the-go matching must not be inferred from the M2 frontend demonstrations. Stripe and Trip Mode remain stretch features, and on-the-go matching remains a reach goal.

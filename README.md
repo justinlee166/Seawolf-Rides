@@ -114,7 +114,24 @@ Run `npm ci` whenever `mobile/package-lock.json` changes. To add an Expo or Reac
 
 ### Environment variables
 
-No environment variables are currently required. Future local values should be documented in `mobile/.env.example` and placed in an ignored local `.env` file. Variables prefixed with `EXPO_PUBLIC_` are embedded in the client bundle and are visible to users; they may contain public client configuration but never private API secrets, administrative credentials, or unrestricted server-side keys. Private server-side secrets must remain outside the mobile application and will be designed with the future backend.
+The M2 Firestore prototype requires six Firebase public client configuration values. From the repository root, create the ignored local file:
+
+```bash
+cp mobile/.env.example mobile/.env
+```
+
+Fill in these values for the development Firebase project:
+
+```text
+EXPO_PUBLIC_FIREBASE_API_KEY=
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+EXPO_PUBLIC_FIREBASE_APP_ID=
+```
+
+Firebase's `EXPO_PUBLIC_*` values are public client configuration embedded in the application bundle; they are not private server secrets. Do not commit `mobile/.env`. Private API secrets, administrative credentials, and unrestricted server-side keys must remain outside the mobile application and will be designed with the future trusted backend.
 
 ## Documentation
 
@@ -124,7 +141,7 @@ No environment variables are currently required. Future local values should be d
 
 ## Development Status
 
-The project is in M2 (design and setup). The Expo app now demonstrates the intended Match, Schedule, and Chats experience and retains a working Firestore read for `commutes/sample-commute-001`. The starter foundation has launched successfully on a physical iPhone using Expo Go, and GitHub Actions has completed successfully on `main`.
+The project is in M2 (design and setup). The Expo app demonstrates the intended Match, Schedule, and Chats experience and performs a real Firestore read for `commutes/sample-commute-001`, including initial, loading, success, missing-document, and recoverable-error states. The prototype has launched successfully on a physical iPhone using Expo Go, and GitHub Actions has completed successfully on `main` using `npm ci`, lint, type-check, tests, and the Expo export/build check.
 
 ### M2 Prototype Scope
 
