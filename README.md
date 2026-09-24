@@ -59,8 +59,8 @@ macOS and Linux developers can use [nvm](https://github.com/nvm-sh/nvm). Windows
 ### Initial setup
 
 ```bash
-git clone <repository-url>
-cd <repository-directory>
+git clone https://github.com/justinlee166/Seawolf-Rides.git
+cd Seawolf-Rides
 nvm install
 nvm use
 cd mobile
@@ -77,13 +77,13 @@ From `mobile/`:
 npm run start
 ```
 
-Open Expo Go on Android and scan the terminal QR code, or scan it with the iOS Camera app. The phone and development computer generally need to be on the same local network. On iOS, Expo CLI and Expo Go may need to be signed into the same Expo account. If local network policy blocks the connection, try:
+Open Expo Go on Android and scan the terminal QR code, or scan it with the iOS Camera app. The phone and development computer generally need to be on the same local network. If Expo Go requests authentication, sign in to Expo Go and run `npx expo login` on the development computer using the same Expo account. If local network policy blocks the connection, try:
 
 ```bash
 npm run start -- --tunnel
 ```
 
-No physical-device run has yet been recorded in this repository.
+The starter application has successfully launched on a physical iPhone using Expo Go.
 
 ## Development
 
@@ -123,7 +123,7 @@ No environment variables are currently required. Future local values should be d
 
 ## Development Status
 
-The project is in M2 (design and setup). The repository now includes a minimal runnable Expo foundation, standardized dependencies, local development scripts, and CI configuration. The M2 persisted-data prototype, Firebase, authentication, matching, routing, and product UI have not been implemented. GitHub-hosted CI and physical-device operation still require team verification.
+The project is in M2 (design and setup). The repository now includes a minimal runnable Expo foundation, standardized dependencies, local development scripts, and CI configuration. The starter application has launched successfully on a physical iPhone using Expo Go, and the GitHub Actions workflow has completed successfully on `main`. The M2 persisted-data prototype, Firebase, authentication, matching, routing, and product UI have not been implemented.
 
 ## Team
 
