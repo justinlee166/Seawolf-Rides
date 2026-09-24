@@ -20,7 +20,7 @@ These are requirements, not claims of implemented functionality. Stripe cost sha
 
 ## Technology Stack
 
-The mobile development foundation uses React Native 0.86.3, Expo SDK 57.0.24, and TypeScript 6.0.3. Node.js 24.21.0 and npm are standardized for local development and CI. Firebase remains the likely authentication and shared-data platform, but Firebase services, backend boundaries, and a routing provider are not yet selected or configured. Matching will begin with deterministic, independently testable rules rather than machine learning.
+The mobile development foundation uses React Native 0.86.3, Expo SDK 57.0.24, and TypeScript 6.0.3. Node.js 24.21.0 and npm are standardized for local development and CI. The M2 prototype uses the Firebase JavaScript SDK to read one restricted sample commute from Firestore; authentication, the final backend boundary, and a routing provider remain unresolved. Matching will begin with deterministic, independently testable rules rather than machine learning.
 
 ## Repository Structure
 
@@ -36,6 +36,7 @@ The mobile development foundation uses React Native 0.86.3, Expo SDK 57.0.24, an
 │   ├── app.json
 │   ├── package.json
 │   ├── package-lock.json
+│   ├── src/                  # Screens, shared UI, fixtures, and Firestore read
 │   └── test/
 └── docs/
     ├── requirements.md       # Preserved M1 proposal and requirements
@@ -123,7 +124,13 @@ No environment variables are currently required. Future local values should be d
 
 ## Development Status
 
-The project is in M2 (design and setup). The repository now includes a minimal runnable Expo foundation, standardized dependencies, local development scripts, and CI configuration. The starter application has launched successfully on a physical iPhone using Expo Go, and the GitHub Actions workflow has completed successfully on `main`. The M2 persisted-data prototype, Firebase, authentication, matching, routing, and product UI have not been implemented.
+The project is in M2 (design and setup). The Expo app now demonstrates the intended Match, Schedule, and Chats experience and retains a working Firestore read for `commutes/sample-commute-001`. The starter foundation has launched successfully on a physical iPhone using Expo Go, and GitHub Actions has completed successfully on `main`.
+
+### M2 Prototype Scope
+
+- **Real:** the Match home screen can load the restricted sample commute from Firestore using local public Firebase client configuration.
+- **Simulated locally:** search criteria, driver recommendations, ride requests, scheduled rides, route placeholders, conversations, and locally appended messages are typed frontend fixtures or component state.
+- **Not implemented:** authentication, real matching, routing/maps, live traffic, persisted ride requests or chat, payments, and the M3 backend workflow.
 
 ## Team
 
