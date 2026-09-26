@@ -13,9 +13,9 @@ interface ChatsScreenProps {
 export function ChatsScreen({ chats, onOpenChat }: ChatsScreenProps) {
   return (
     <Screen
-      eyebrow="COORDINATION"
+      eyebrow="MESSAGES"
       subtitle="Continue conversations about upcoming commutes."
-      title="Chats"
+      title="Inbox"
     >
       <Card style={styles.inboxCard}>
         {chats.map((chat, index) => (

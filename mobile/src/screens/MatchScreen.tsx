@@ -15,7 +15,7 @@ interface MatchScreenProps {
 export function MatchScreen({ onFindCommuters }: MatchScreenProps) {
   return (
     <Screen
-      eyebrow="MATCH"
+      eyebrow="FIND A RIDE"
       subtitle="Find a commute that fits your schedule."
       title="Seawolf Rides"
     >

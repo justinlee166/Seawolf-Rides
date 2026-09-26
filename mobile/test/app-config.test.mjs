@@ -17,8 +17,14 @@ test('Expo configuration identifies the Seawolf Rides mobile app', async () => {
   assert.equal(expo.orientation, 'portrait');
 });
 
-test('the package entrypoint and configured image assets exist', async () => {
+test('the app boots through Expo Router with a root layout', async () => {
   const packageJson = await readJson('package.json');
+
+  assert.equal(packageJson.main, 'expo-router/entry');
+  await access(new URL('src/app/_layout.tsx', projectUrl));
+});
+
+test('the configured image assets exist', async () => {
   const { expo } = await readJson('app.json');
   const configuredAssets = [
     expo.icon,
@@ -28,6 +34,5 @@ test('the package entrypoint and configured image assets exist', async () => {
     expo.web.favicon,
   ];
 
-  await access(new URL(packageJson.main, projectUrl));
   await Promise.all(configuredAssets.map((asset) => access(new URL(asset, projectUrl))));
 });
