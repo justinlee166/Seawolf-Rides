@@ -32,11 +32,11 @@ The mobile development foundation uses React Native 0.86.3, Expo SDK 57.0.24, an
 ├── package.json              # Root convenience scripts
 ├── README.md
 ├── mobile/                   # Minimal Expo/React Native TypeScript application
-│   ├── App.tsx
 │   ├── app.json
 │   ├── package.json
 │   ├── package-lock.json
-│   ├── src/                  # Screens, shared UI, fixtures, and Firestore read
+│   ├── src/app/              # Expo Router routes: (auth) sign-in and (tabs) Home, Rides, Inbox, Account
+│   ├── src/                  # Screens, shared UI, fixtures, auth, and Firestore read
 │   └── test/
 └── docs/
     ├── requirements.md       # Preserved M1 proposal and requirements

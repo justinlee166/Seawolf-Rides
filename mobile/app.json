@@ -4,6 +4,7 @@
     "slug": "seawolf-rides",
     "version": "0.1.0",
     "orientation": "portrait",
+    "scheme": "seawolfrides",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
@@ -20,6 +21,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-font"
+    ]
   }
 }

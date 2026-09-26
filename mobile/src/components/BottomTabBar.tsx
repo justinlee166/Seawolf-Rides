@@ -1,35 +1,68 @@
+import { Tabs } from 'expo-router';
+import { ComponentProps } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, spacing } from '../theme';
+import { colors, radii, spacing } from '../theme';
 
-export type MainTab = 'match' | 'schedule' | 'chats';
+type BottomTabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>['tabBar']>>[0];
 
-interface BottomTabBarProps {
-  activeTab: MainTab;
-  onSelect: (tab: MainTab) => void;
+const isAndroid = process.env.EXPO_OS === 'android';
+const ICON_SIZE = 24;
+
+function formatBadge(badge: string | number): string {
+  return typeof badge === 'number' && badge > 99 ? '99+' : String(badge);
 }
 
-const tabs: { id: MainTab; label: string }[] = [
-  { id: 'match', label: 'Match' },
-  { id: 'schedule', label: 'Schedule' },
-  { id: 'chats', label: 'Chats' },
-];
-
-export function BottomTabBar({ activeTab, onSelect }: BottomTabBarProps) {
+// Follows the platform tab bar conventions: iOS tints the icon and label of the
+// selected tab; Android (Material 3) adds a pill indicator behind the selected icon.
+export function BottomTabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
   return (
-    <View accessibilityRole="tablist" style={styles.container}>
-      {tabs.map((tab) => {
-        const active = tab.id === activeTab;
+    <View
+      accessibilityRole="tablist"
+      style={[styles.bar, { paddingBottom: Math.max(insets.bottom, spacing.sm) }]}
+    >
+      {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key];
+        const focused = state.index === index;
+        const color = focused ? colors.accent : colors.textMuted;
+        const label = options.title ?? route.name;
+        const badge = options.tabBarBadge;
+
+        function selectTab() {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
+
+          // Re-tapping the active tab is handled by its stack, which pops to the root.
+          if (!focused && !event.defaultPrevented) {
+            navigation.navigate(route.name, route.params);
+          }
+        }
+
         return (
           <Pressable
+            accessibilityLabel={options.tabBarAccessibilityLabel ?? label}
             accessibilityRole="tab"
-            accessibilityState={{ selected: active }}
-            key={tab.id}
-            onPress={() => onSelect(tab.id)}
-            style={({ pressed }) => [styles.tab, pressed && styles.tabPressed]}
+            accessibilityState={{ selected: focused }}
+            android_ripple={{ borderless: true, color: colors.accentSoft, radius: 36 }}
+            key={route.key}
+            onLongPress={() => navigation.emit({ type: 'tabLongPress', target: route.key })}
+            onPress={selectTab}
+            style={styles.tab}
           >
-            <View style={[styles.indicator, active && styles.indicatorActive]} />
-            <Text style={[styles.label, active && styles.labelActive]}>{tab.label}</Text>
+            <View style={[styles.iconWrap, isAndroid && focused && styles.indicator]}>
+              {options.tabBarIcon?.({ focused, color, size: ICON_SIZE })}
+              {badge !== undefined && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{formatBadge(badge)}</Text>
+                </View>
+              )}
+            </View>
+            <Text numberOfLines={1} style={[styles.label, { color }, focused && styles.labelFocused]}>
+              {label}
+            </Text>
           </Pressable>
         );
       })}
@@ -38,41 +71,55 @@ export function BottomTabBar({ activeTab, onSelect }: BottomTabBarProps) {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  bar: {
     backgroundColor: colors.surface,
     borderTopColor: colors.border,
-    borderTopWidth: 1,
+    borderTopWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
-    paddingBottom: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
+    paddingTop: isAndroid ? spacing.md : spacing.sm,
   },
   tab: {
     alignItems: 'center',
     flex: 1,
-    justifyContent: 'center',
-    minHeight: 52,
+    gap: isAndroid ? spacing.xs : 2,
+    justifyContent: 'flex-start',
+    minHeight: 44,
   },
-  tabPressed: {
-    opacity: 0.62,
+  iconWrap: {
+    alignItems: 'center',
+    height: isAndroid ? 32 : 28,
+    justifyContent: 'center',
+    width: 64,
   },
   indicator: {
-    backgroundColor: 'transparent',
-    borderRadius: 2,
-    height: 3,
-    marginBottom: spacing.sm,
-    width: 30,
+    backgroundColor: colors.accentSoft,
+    borderRadius: radii.pill,
   },
-  indicatorActive: {
+  badge: {
+    alignItems: 'center',
     backgroundColor: colors.accent,
+    borderColor: colors.surface,
+    borderRadius: radii.pill,
+    borderWidth: 2,
+    height: 20,
+    justifyContent: 'center',
+    left: 38,
+    minWidth: 20,
+    paddingHorizontal: 4,
+    position: 'absolute',
+    top: -4,
+  },
+  badgeText: {
+    color: colors.surface,
+    fontSize: 11,
+    fontVariant: ['tabular-nums'],
+    fontWeight: '800',
   },
   label: {
-    color: colors.textMuted,
-    fontSize: 13,
+    fontSize: isAndroid ? 12 : 10,
     fontWeight: '600',
   },
-  labelActive: {
-    color: colors.accent,
-    fontWeight: '800',
+  labelFocused: {
+    fontWeight: '700',
   },
 });
